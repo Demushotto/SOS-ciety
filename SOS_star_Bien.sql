@@ -190,7 +190,7 @@ SELECT
             WHEN a.estado = 'no asistio' THEN 1
             ELSE 0
         END
-    ) AS inasistencias,
+    ) AS faltas,
 
     ROUND(
         SUM(
@@ -216,7 +216,7 @@ GROUP BY
     c.id_curso,
     c.nombre;
 
-CREATE OR REPLACE VIEW vw_inasistencias AS
+CREATE OR REPLACE VIEW vw_Faltas AS
 SELECT
     e.id_estudiante,
     e.codigo_estudiante,
@@ -224,8 +224,7 @@ SELECT
     e.apellido,
     c.id_curso,
     c.nombre AS curso,
-    COUNT(a.id_asistencia) AS cantidad_inasistencias
-
+    COUNT(a.id_asistencia) AS cantidad_Faltas
 FROM estudiante e
 INNER JOIN asistencia a
     ON e.id_estudiante = a.id_estudiante
@@ -242,7 +241,7 @@ GROUP BY
     c.id_curso,
     c.nombre;
 
-CREATE OR REPLACE VIEW vw_alertas_inasistencia AS
+CREATE OR REPLACE VIEW vw_alertas_Faltas  AS
 SELECT
     i.id_estudiante,
     i.codigo_estudiante,
@@ -250,16 +249,16 @@ SELECT
     i.apellido,
     i.id_curso,
     i.curso,
-    i.cantidad_inasistencias,
+    i.cantidad_Faltas,
 
     CASE
-        WHEN i.cantidad_inasistencias >= 3
+        WHEN i.cantidad_Faltas >= 3
             THEN 'ALERTA'
         ELSE 'SIN ALERTA'
     END AS estado_alerta
 
-FROM vw_inasistencias i
-WHERE i.cantidad_inasistencias >= 3;
+FROM vw_Faltas i
+WHERE i.cantidad_Faltas >= 3;
 
 CREATE OR REPLACE VIEW vw_progreso_educativo AS
 SELECT
@@ -329,4 +328,3 @@ ALTER TABLE estudiante_habilidad
 ADD COLUMN nivel ENUM('basico', 'intermedio', 'avanzado') NOT NULL DEFAULT 'basico',
 ADD COLUMN fecha_registro DATE NOT NULL DEFAULT (CURRENT_DATE),
 ADD COLUMN observacion TEXT;
-
