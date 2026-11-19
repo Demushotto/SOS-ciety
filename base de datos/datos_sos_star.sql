@@ -1,217 +1,3 @@
-
--- =====================================================
--- BASE DE DATOS SOS_star
--- Sistema de seguimiento de estudiantes
--- =====================================================
-
-DROP DATABASE IF EXISTS SOS_star;
-
-CREATE DATABASE SOS_star
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
-
-USE SOS_star;
-
--- =====================================================
--- 1. TABLA ESTUDIANTE
--- =====================================================
-
-CREATE TABLE estudiante (
-    id_estudiante INT AUTO_INCREMENT PRIMARY KEY,
-    codigo_estudiante VARCHAR(20) NOT NULL UNIQUE,
-    nombre VARCHAR(100) NOT NULL,
-    apellido VARCHAR(100) NOT NULL,
-    numero_contacto VARCHAR(20),
-    direccion VARCHAR(255)
-);
-
--- =====================================================
--- 2. TABLA CURSO
--- =====================================================
-
-CREATE TABLE curso (
-    id_curso INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(150) NOT NULL,
-    fecha DATE NOT NULL,
-    descripcion TEXT
-);
-
--- =====================================================
--- 3. TABLA USUARIO
--- =====================================================
-
-CREATE TABLE usuario (
-    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    apellido VARCHAR(100) NOT NULL,
-    correo VARCHAR(150) NOT NULL UNIQUE,
-    contrasena VARCHAR(8) NOT NULL
-);
-
--- =====================================================
--- 4. TABLA INSCRIPCIONES
--- =====================================================
-
-CREATE TABLE inscripciones (
-    id_inscripcion INT AUTO_INCREMENT PRIMARY KEY,
-    fecha_inscripcion DATE NOT NULL,
-    id_estudiante INT NOT NULL,
-    id_curso INT NOT NULL,
-
-    UNIQUE (id_estudiante, id_curso),
-
-    FOREIGN KEY (id_estudiante)
-        REFERENCES estudiante(id_estudiante)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
-
-    FOREIGN KEY (id_curso)
-        REFERENCES curso(id_curso)
-        ON UPDATE CASCADE ON DELETE RESTRICT
-);
-
--- =====================================================
--- 5. TABLA ACTIVIDAD
--- =====================================================
-
-CREATE TABLE actividad (
-    id_actividad INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(150) NOT NULL,
-    descripcion TEXT,
-    fecha DATE NOT NULL,
-    id_curso INT NOT NULL,
-
-    FOREIGN KEY (id_curso)
-        REFERENCES curso(id_curso)
-        ON UPDATE CASCADE ON DELETE RESTRICT
-);
-
--- =====================================================
--- 6. TABLA ASISTENCIA
--- =====================================================
-
-CREATE TABLE asistencia (
-    id_asistencia INT AUTO_INCREMENT PRIMARY KEY,
-    fecha DATE NOT NULL,
-    estado ENUM('asistio', 'no asistio') NOT NULL,
-    id_estudiante INT NOT NULL,
-    id_curso INT NOT NULL,
-    id_actividad INT NULL,
-
-    INDEX idx_asistencia_estudiante_curso
-        (id_estudiante, id_curso),
-
-    FOREIGN KEY (id_estudiante)
-        REFERENCES estudiante(id_estudiante)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
-
-    FOREIGN KEY (id_curso)
-        REFERENCES curso(id_curso)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
-
-    FOREIGN KEY (id_actividad)
-        REFERENCES actividad(id_actividad)
-        ON UPDATE CASCADE ON DELETE RESTRICT
-);
-
--- =====================================================
--- 7. TABLA OBSERVACION
--- =====================================================
-
-CREATE TABLE observacion (
-    id_observacion INT AUTO_INCREMENT PRIMARY KEY,
-    fecha DATE NOT NULL,
-    comentario TEXT NOT NULL,
-    id_estudiante INT NOT NULL,
-    id_usuario INT NOT NULL,
-
-    FOREIGN KEY (id_estudiante)
-        REFERENCES estudiante(id_estudiante)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
-
-    FOREIGN KEY (id_usuario)
-        REFERENCES usuario(id_usuario)
-        ON UPDATE CASCADE ON DELETE RESTRICT
-);
-
--- =====================================================
--- 8. TABLA HABILIDAD
--- =====================================================
-
-CREATE TABLE habilidad (
-    id_habilidad INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL UNIQUE,
-    descripcion TEXT
-);
-
--- =====================================================
--- 9. TABLA ESTUDIANTE_HABILIDAD
--- =====================================================
-
-CREATE TABLE estudiante_habilidad (
-    id_estudiante_habilidad INT AUTO_INCREMENT PRIMARY KEY,
-    id_estudiante INT NOT NULL,
-    id_habilidad INT NOT NULL,
-    id_actividad INT NULL,
-    nivel ENUM('basico', 'intermedio', 'avanzado') NOT NULL,
-    fecha_registro DATE NOT NULL,
-    observacion TEXT,
-
-    UNIQUE (id_estudiante, id_habilidad, id_actividad),
-
-    FOREIGN KEY (id_estudiante)
-        REFERENCES estudiante(id_estudiante)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
-
-    FOREIGN KEY (id_habilidad)
-        REFERENCES habilidad(id_habilidad)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
-
-    FOREIGN KEY (id_actividad)
-        REFERENCES actividad(id_actividad)
-        ON UPDATE CASCADE ON DELETE RESTRICT
-);
-
--- =====================================================
--- 10. TABLA EVALUACION
--- =====================================================
-
-CREATE TABLE evaluacion (
-    id_evaluacion INT AUTO_INCREMENT PRIMARY KEY,
-    id_estudiante INT NOT NULL,
-    id_curso INT NOT NULL,
-    id_actividad INT NULL,
-    id_usuario INT NOT NULL,
-    fecha DATE NOT NULL,
-    tipo_evaluacion VARCHAR(100) NOT NULL,
-    puntaje DECIMAL(6,2) NOT NULL,
-    puntaje_maximo DECIMAL(6,2) NOT NULL,
-    observacion TEXT,
-
-    CHECK (puntaje >= 0),
-    CHECK (puntaje_maximo > 0),
-    CHECK (puntaje <= puntaje_maximo),
-
-    FOREIGN KEY (id_estudiante)
-        REFERENCES estudiante(id_estudiante)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
-
-    FOREIGN KEY (id_curso)
-        REFERENCES curso(id_curso)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
-
-    FOREIGN KEY (id_actividad)
-        REFERENCES actividad(id_actividad)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
-
-    FOREIGN KEY (id_usuario)
-        REFERENCES usuario(id_usuario)
-        ON UPDATE CASCADE ON DELETE RESTRICT
-);
-
--- =====================================================
--- INSERTAR DATOS DE ESTUDIANTES
--- =====================================================
-
 INSERT INTO estudiante
 (id_estudiante, codigo_estudiante, nombre, apellido, numero_contacto, direccion)
 VALUES
@@ -238,10 +24,6 @@ VALUES
 (21, 'SOS-00021', 'José Luis', 'Puma Huayta', '71567823', 'Zona San Antonio, calle 2 Nº 8'),
 (22, 'SOS-00022', 'Griselda Roxana', 'Sejas Arce', '74985231', 'Arocagua, calle S/N');
 
--- =====================================================
--- INSERTAR CURSOS
--- =====================================================
-
 INSERT INTO curso (id_curso, nombre, fecha, descripcion) VALUES
 (1, 'Apoyo escolar y nivelación primaria', '2026-02-09',
 'Refuerzo en lectura, escritura y matemáticas para niños y niñas con retraso escolar o que abandonaron temporalmente la escuela.'),
@@ -262,11 +44,6 @@ INSERT INTO curso (id_curso, nombre, fecha, descripcion) VALUES
 (9, 'Taller de emprendimiento y habilidades para la vida', '2026-08-03',
 'Formación en planificación de pequeños emprendimientos, manejo de dinero, comunicación y resolución de conflictos.');
 
--- =====================================================
--- INSERTAR USUARIOS
--- CONTRASEÑAS DE EXACTAMENTE 8 DÍGITOS
--- =====================================================
-
 INSERT INTO usuario
 (id_usuario, nombre, apellido, correo, contrasena)
 VALUES
@@ -278,10 +55,6 @@ VALUES
 (6, 'Grover Antonio', 'Mamani Quispe', 'grover.mamani@estrellasenlacalle.org', '67890123'),
 (7, 'Adelaida', 'Nina Choque', 'adelaida.nina@estrellasenlacalle.org', '78901234'),
 (8, 'Fabiola Andrea', 'Rojas Zambrana', 'fabiola.rojas@estrellasenlacalle.org', '89012345');
-
--- =====================================================
--- INSERTAR INSCRIPCIONES
--- =====================================================
 
 INSERT INTO inscripciones (fecha_inscripcion, id_estudiante, id_curso) VALUES
 ('2026-02-04', 1, 1),
@@ -310,10 +83,6 @@ INSERT INTO inscripciones (fecha_inscripcion, id_estudiante, id_curso) VALUES
 ('2026-07-29', 12, 9),
 ('2026-07-30', 22, 9);
 
--- =====================================================
--- INSERTAR ACTIVIDADES
--- =====================================================
-
 INSERT INTO actividad
 (id_actividad, nombre, descripcion, fecha, id_curso)
 VALUES
@@ -329,10 +98,6 @@ VALUES
 (10, 'Resolución de problemas', 'Resolución de problemas matemáticos y escolares.', '2026-10-26', 1),
 (11, 'Entrenamiento deportivo', 'Ejercicios físicos y coordinación en equipo.', '2026-10-10', 8),
 (12, 'Partido recreativo', 'Actividad deportiva de integración.', '2026-10-17', 8);
-
--- =====================================================
--- INSERTAR ASISTENCIAS
--- =====================================================
 
 INSERT INTO asistencia (fecha, estado, id_estudiante, id_curso) VALUES
 ('2026-10-03', 'asistio', 8, 9),
@@ -361,19 +126,12 @@ INSERT INTO asistencia (fecha, estado, id_estudiante, id_curso) VALUES
 ('2026-10-10', 'asistio', 9, 8),
 ('2026-10-17', 'no asistio', 5, 8);
 
--- =====================================================
--- VINCULAR ASISTENCIAS CON SUS ACTIVIDADES
--- =====================================================
-
 UPDATE asistencia AS a
 INNER JOIN actividad AS ac
     ON ac.id_curso = a.id_curso
     AND ac.fecha = a.fecha
 SET a.id_actividad = ac.id_actividad;
 
--- =====================================================
--- INSERTAR OBSERVACIONES
--- =====================================================
 
 INSERT INTO observacion
 (fecha, comentario, id_estudiante, id_usuario)
@@ -394,9 +152,6 @@ VALUES
 ('2026-10-14', 'Colabora con el orden y la limpieza del espacio del taller; se destaca su compañerismo.', 19, 7),
 ('2026-11-04', 'Cerró el año con asistencia constante y mejoras en sus calificaciones escolares; se sugiere continuar en 2027.', 1, 1);
 
--- =====================================================
--- INSERTAR HABILIDADES
--- =====================================================
 
 INSERT INTO habilidad (id_habilidad, nombre, descripcion) VALUES
 (1, 'Comunicación', 'Capacidad para expresar ideas y comunicarse con otras personas.'),
@@ -408,9 +163,6 @@ INSERT INTO habilidad (id_habilidad, nombre, descripcion) VALUES
 (7, 'Coordinación motriz', 'Capacidad para realizar movimientos y actividades físicas.'),
 (8, 'Emprendimiento', 'Capacidad para planificar y desarrollar ideas de negocio.');
 
--- =====================================================
--- INSERTAR HABILIDADES DE LOS ESTUDIANTES
--- =====================================================
 
 INSERT INTO estudiante_habilidad
 (id_estudiante, id_habilidad, id_actividad, nivel, fecha_registro, observacion)
@@ -429,9 +181,6 @@ VALUES
 (19, 2, NULL, 'intermedio', '2026-10-14', 'Colabora con sus compañeros.'),
 (22, 8, 3, 'basico', '2026-10-17', 'Participa en actividades de emprendimiento.');
 
--- =====================================================
--- INSERTAR EVALUACIONES
--- =====================================================
 
 INSERT INTO evaluacion
 (id_estudiante, id_curso, id_actividad, id_usuario, fecha,
@@ -452,9 +201,6 @@ VALUES
 (9, 8, 11, 2, '2026-10-10', 'Participación deportiva', 90, 100,
  'Participa activamente en las actividades deportivas.');
 
--- =====================================================
--- VISTA 1: PORCENTAJE DE ASISTENCIA
--- =====================================================
 
 CREATE VIEW vw_porcentaje_asistencia AS
 SELECT
@@ -494,9 +240,6 @@ GROUP BY
     c.id_curso,
     c.nombre;
 
--- =====================================================
--- VISTA 2: CANTIDAD DE INASISTENCIAS
--- =====================================================
 
 CREATE VIEW vw_inasistencias AS
 SELECT
@@ -521,10 +264,6 @@ GROUP BY
     c.id_curso,
     c.nombre;
 
--- =====================================================
--- VISTA 3: ALERTAS POR 3 O MÁS INASISTENCIAS
--- =====================================================
-
 CREATE VIEW vw_alertas_inasistencia AS
 SELECT
     id_estudiante,
@@ -539,10 +278,6 @@ FROM vw_inasistencias
 
 WHERE cantidad_inasistencias >= 3;
 
--- =====================================================
--- VISTA 4: PROGRESO EDUCATIVO
--- COMPARA LA PRIMERA Y LA ÚLTIMA EVALUACIÓN
--- =====================================================
 
 CREATE VIEW vw_progreso_educativo AS
 SELECT
@@ -617,35 +352,4 @@ GROUP BY
     e.apellido,
     c.id_curso,
     c.nombre;
-
--- =====================================================
--- CONSULTAS PARA COMPROBAR LOS DATOS
--- =====================================================
-
-SELECT 'estudiante' AS tabla, COUNT(*) AS registros FROM estudiante
-UNION ALL
-SELECT 'curso', COUNT(*) FROM curso
-UNION ALL
-SELECT 'usuario', COUNT(*) FROM usuario
-UNION ALL
-SELECT 'inscripciones', COUNT(*) FROM inscripciones
-UNION ALL
-SELECT 'actividad', COUNT(*) FROM actividad
-UNION ALL
-SELECT 'asistencia', COUNT(*) FROM asistencia
-UNION ALL
-SELECT 'observacion', COUNT(*) FROM observacion
-UNION ALL
-SELECT 'habilidad', COUNT(*) FROM habilidad
-UNION ALL
-SELECT 'estudiante_habilidad', COUNT(*) FROM estudiante_habilidad
-UNION ALL
-SELECT 'evaluacion', COUNT(*) FROM evaluacion;
-
--- Consultar las vistas creadas
-
-SELECT * FROM vw_porcentaje_asistencia;
-SELECT * FROM vw_inasistencias;
-SELECT * FROM vw_alertas_inasistencia;
-SELECT * FROM vw_progreso_educativo;
 

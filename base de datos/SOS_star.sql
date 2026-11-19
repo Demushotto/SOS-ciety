@@ -6,10 +6,6 @@ COLLATE utf8mb4_unicode_ci;
 
 USE SOS_star;
 
--- =========================================================
--- 1. ESTUDIANTE
--- =========================================================
-
 CREATE TABLE estudiante (
     id_estudiante INT AUTO_INCREMENT PRIMARY KEY,
     codigo_estudiante VARCHAR(20) NOT NULL UNIQUE,
@@ -19,10 +15,6 @@ CREATE TABLE estudiante (
     direccion VARCHAR(200)
 );
 
--- =========================================================
--- 2. CURSO
--- =========================================================
-
 CREATE TABLE curso (
     id_curso INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(150) NOT NULL,
@@ -30,9 +22,6 @@ CREATE TABLE curso (
     descripcion TEXT
 );
 
--- =========================================================
--- 3. USUARIO
--- =========================================================
 
 CREATE TABLE usuario (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
@@ -41,10 +30,6 @@ CREATE TABLE usuario (
     correo VARCHAR(150) NOT NULL UNIQUE,
     contrasena VARCHAR(255) NOT NULL
 );
-
--- =========================================================
--- 4. INSCRIPCIONES
--- =========================================================
 
 CREATE TABLE inscripciones (
     id_inscripcion INT AUTO_INCREMENT PRIMARY KEY,
@@ -63,10 +48,6 @@ CREATE TABLE inscripciones (
         ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
--- =========================================================
--- 5. ACTIVIDAD
--- =========================================================
-
 CREATE TABLE actividad (
     id_actividad INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(150) NOT NULL,
@@ -78,10 +59,6 @@ CREATE TABLE actividad (
         REFERENCES curso(id_curso)
         ON UPDATE CASCADE ON DELETE RESTRICT
 );
-
--- =========================================================
--- 6. ASISTENCIA
--- =========================================================
 
 CREATE TABLE asistencia (
     id_asistencia INT AUTO_INCREMENT PRIMARY KEY,
@@ -110,10 +87,6 @@ CREATE TABLE asistencia (
         (estado)
 );
 
--- =========================================================
--- 7. OBSERVACION
--- =========================================================
-
 CREATE TABLE observacion (
     id_observacion INT AUTO_INCREMENT PRIMARY KEY,
     fecha DATE NOT NULL,
@@ -130,19 +103,11 @@ CREATE TABLE observacion (
         ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
--- =========================================================
--- 8. HABILIDAD
--- =========================================================
-
 CREATE TABLE habilidad (
     id_habilidad INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL UNIQUE,
     descripcion TEXT
 );
-
--- =========================================================
--- 9. ESTUDIANTE_HABILIDAD
--- =========================================================
 
 CREATE TABLE estudiante_habilidad (
     id_estudiante_habilidad INT AUTO_INCREMENT PRIMARY KEY,
@@ -164,10 +129,6 @@ CREATE TABLE estudiante_habilidad (
 
     UNIQUE (id_estudiante, id_habilidad, id_actividad)
 );
-
--- =========================================================
--- 10. EVALUACION
--- =========================================================
 
 CREATE TABLE evaluacion (
     id_evaluacion INT AUTO_INCREMENT PRIMARY KEY,
@@ -204,11 +165,6 @@ CREATE TABLE evaluacion (
     INDEX idx_evaluacion_estudiante_curso
         (id_estudiante, id_curso, fecha)
 );
-
--- =========================================================
--- VISTA 1: PORCENTAJE DE ASISTENCIA
--- Formula: (asistencias / total de registros) * 100
--- =========================================================
 
 CREATE OR REPLACE VIEW vw_porcentaje_asistencia AS
 SELECT
@@ -259,10 +215,6 @@ GROUP BY
     c.id_curso,
     c.nombre;
 
--- =========================================================
--- VISTA 2: INASISTENCIAS POR ESTUDIANTE Y CURSO
--- =========================================================
-
 CREATE OR REPLACE VIEW vw_inasistencias AS
 SELECT
     e.id_estudiante,
@@ -289,11 +241,6 @@ GROUP BY
     c.id_curso,
     c.nombre;
 
--- =========================================================
--- VISTA 3: ALERTAS
--- Se genera una alerta con 3 o mas inasistencias
--- =========================================================
-
 CREATE OR REPLACE VIEW vw_alertas_inasistencia AS
 SELECT
     i.id_estudiante,
@@ -312,11 +259,6 @@ SELECT
 
 FROM vw_inasistencias i
 WHERE i.cantidad_inasistencias >= 3;
-
--- =========================================================
--- VISTA 4: PROGRESO EDUCATIVO
--- Compara primera y ultima evaluacion por estudiante/curso
--- =========================================================
 
 CREATE OR REPLACE VIEW vw_progreso_educativo AS
 SELECT
@@ -383,27 +325,4 @@ AND NOT EXISTS (
       )
 );
 
--- =========================================================
--- CONSULTAS DE COMPROBACION
--- =========================================================
-
-SELECT * FROM estudiante;
-SELECT * FROM curso;
-SELECT * FROM usuario;
-SELECT * FROM inscripciones;
-SELECT * FROM actividad;
-SELECT * FROM asistencia;
-SELECT * FROM observacion;
-SELECT * FROM habilidad;
-SELECT * FROM estudiante_habilidad;
-SELECT * FROM evaluacion;
-
-SELECT * FROM vw_porcentaje_asistencia;
-SELECT * FROM vw_inasistencias;
-SELECT * FROM vw_alertas_inasistencia;
-SELECT * FROM vw_progreso_educativo;
-
--- =========================================================
--- FIN DE LA BASE DE DATOS SOS_star
--- =========================================================
 
