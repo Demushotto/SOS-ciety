@@ -130,7 +130,8 @@ UPDATE asistencia AS a
 INNER JOIN actividad AS ac
     ON ac.id_curso = a.id_curso
     AND ac.fecha = a.fecha
-SET a.id_actividad = ac.id_actividad;
+SET a.id_actividad = ac.id_actividad
+WHERE a.id_asistencia > 0;
 
 
 INSERT INTO observacion
@@ -202,7 +203,7 @@ VALUES
  'Participa activamente en las actividades deportivas.');
 
 
-CREATE VIEW vw_porcentaje_asistencia AS
+CREATE OR REPLACE VIEW vw_porcentaje_asistencia AS
 SELECT
     e.id_estudiante,
     CONCAT(e.nombre, ' ', e.apellido) AS estudiante,
@@ -241,7 +242,7 @@ GROUP BY
     c.nombre;
 
 
-CREATE VIEW vw_inasistencias AS
+CREATE OR REPLACE VIEW vw_inasistencias AS
 SELECT
     e.id_estudiante,
     CONCAT(e.nombre, ' ', e.apellido) AS estudiante,
@@ -264,7 +265,7 @@ GROUP BY
     c.id_curso,
     c.nombre;
 
-CREATE VIEW vw_alertas_inasistencia AS
+CREATE OR REPLACE VIEW vw_alertas_inasistencia AS
 SELECT
     id_estudiante,
     estudiante,
@@ -279,7 +280,7 @@ FROM vw_inasistencias
 WHERE cantidad_inasistencias >= 3;
 
 
-CREATE VIEW vw_progreso_educativo AS
+CREATE OR REPLACE VIEW vw_progreso_educativo AS
 SELECT
     e.id_estudiante,
     CONCAT(e.nombre, ' ', e.apellido) AS estudiante,
